@@ -21,7 +21,7 @@ struct Prodotto
 
 struct Supermercato
 {
-    int size_prodotti;
+    int size_prodotti;    
     int codice_supermercato;
     struct Prodotto *prodotti;  
 };
@@ -224,11 +224,17 @@ int main()
         case 4:
             int cod_mrkt_close = 0;
             int cod_mrkt_trasf = 0;
+            int cod_prod_trasf = 0;
+            int qta_prod_trasf = 0;            
             bool operazione_ok = false;
+            bool prodotto_presente = false;
             
             while(operazione_ok = false) {
                 printf("\n[Codice market da chiudere] [codice market trasferimento prodotti]");
                 scanf("\n%d %d", cod_mrkt_close, cod_mrkt_trasf);
+
+                // i => index market in chiusura
+                // x => index market su cui trasferire i prodotti
                 
                 for(int i = 0; i < num_market_aperti; i++)
                 {
@@ -238,26 +244,80 @@ int main()
                         {
                             if(supermercati[x].codice_supermercato == cod_mrkt_trasf) 
                             {
-                                // Ciclo per spostamento Prodotti in altro market
+                                //ciclo per spostamento Prodotti in altro market
                                 for (int y = 0; y < supermercati[i].size_prodotti; y++) {
                                     if(supermercati[x].size_prodotti > 0) {
 
-                                        // controllo se il prodotto è già in vendita: se sì sposto la relativa quantità altrimenti istanzio il prodotto nell'array
+                                        //controllo se il prodotto è già in vendita
                                         for (int u = 0; u < supermercati[x].size_prodotti; u++)
-                                        {                                            
-                                            if(supermercati[x].prodotti[u].codice_prodotto)
+                                        {    
+                                            cod_prod_trasf = supermercati[i].prodotti[u].codice_prodotto;
+                                            qta_prod_trasf = supermercati[i].prodotti[u].quantita_presente;
+
+                                            //se SI sommo la relativa quantità dal market in chisura a quello prescelto per il trasferimento
+                                            if(supermercati[x].prodotti[u].codice_prodotto == supermercati[i].prodotti[y].codice_prodotto)
+                                            {
+                                                cod_prod_trasf = 0;
+                                                qta_prod_trasf = 0;
+                                                prodotto_presente = true;
+                                                supermercati[x].prodotti[u].quantita_presente = supermercati[x].prodotti[u].quantita_presente + supermercati[i].prodotti[y].quantita_presente;
+                                            }
                                         }
+
+                                        //se NO allora aggiungo nuovo prodotto al market
+                                        if(prodotto_presente == false) 
+                                        {
+                                            supermercati[x].prodotti = (struct Prodotto *)realloc(supermercati[x].prodotti, sizeof(struct Prodotto));
+                                            if (supermercati[x].prodotti == NULL)
+                                            {
+                                                printf("Errore nell'allocazione di memoria.\n");
+                                                return 1;
+                                            }
+                                            supermercati[x].size_prodotti++;
+                                            supermercati[x].prodotti[supermercati[x].size_prodotti].codice_prodotto = cod_prod_trasf;
+                                            supermercati[x].prodotti[supermercati[x].size_prodotti].quantita_presente = qta_prod_trasf;
+                                        }                                        
+                                    }
+                                    else // Se la lista prodotti per il market non è ancora stata istanziata, malloc per size_prodotti da trasferire e procedo con il trasferimento
+                                    {
                                         
+                                        supermercati[x].prodotti = (struct Prodotto *)malloc(supermercati[i].size_prodotti * sizeof(struct Prodotto));
+                                        if (supermercati[x].prodotti == NULL)
+                                        {
+                                            printf("Errore nell'allocazione di memoria.\n");
+                                            return 1;
+                                        }
+
+                                        for(int w = 0; w < supermercati[i].size_prodotti; w++)   
+                                        {
+                                            supermercati[x].prodotti[w].codice_fornitore = supermercati[i].prodotti[w].codice_fornitore;
+                                            supermercati[x].prodotti[w].codice_prodotto = supermercati[i].prodotti[w].codice_prodotto;
+                                            supermercati[x].prodotti[w].quantita_presente = supermercati[i].prodotti[w].quantita_presente;
+                                        }                                        
                                     }
                                 }
                             }
                         }
-                        
-                    }
-                }
-            }
 
-            break;
+                            //elimnazione effettiva market
+
+                            struct Supermercato* tempMarket = malloc((num_market_aperti - 1) * sizeof(struct Supermercato));
+
+                            for (int t = 0; t < i; t++) {
+                                tempMarket[t] = supermercati[t];
+                            }
+
+                            for (int t = i + 1; i < num_market_aperti; t++) {
+                                tempMarket[i - 1] = supermercati[t];
+                            }
+
+                            free(supermercati);
+                            supermercati = tempMarket;
+                            num_market_aperti--;
+                        }                        
+                    }
+                }            
+            goto start;            
         // Vedi prodotti in esaurimento
         case 5:     
             bool market_exists = false; 
