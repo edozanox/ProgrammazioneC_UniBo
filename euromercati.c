@@ -33,7 +33,25 @@ struct Supermercato
 // stampa_prodotti_in_esaurimento => quantita_presente < quantita_mimima per ogni market
 // miglior_supermercato => 
 // individua il codice market al cui interno è mantenuto l’insieme di prodotti con valore maggiore
- 
+
+int compareProdListino(const void *a, const void *b)
+{
+    struct ProdListino *structA = (struct ProdListino *)a;
+    struct ProdListino *structB = (struct ProdListino *)b;
+
+    if (structA->codice_prodotto < structB->codice_prodotto)
+    {
+        return -1;
+    }
+    else if (structA->codice_prodotto > structB->codice_prodotto)
+    {
+        return 1;
+    }
+    else
+    {
+        return 0; // Gli ID sono uguali
+    }
+}
  
 int main()
 {    
@@ -96,9 +114,10 @@ int main()
                         &listino[qta].quantita_minima, &listino[qta].prezzo_unitario);                
             }
 
-            //TODO implementare algoritmo di ordinamento            
+            //algoritmo di ordinamento
+            qsort(listino, num_prod_in_listino, sizeof(struct ProdListino), compareProdListino);
 
-            //Termino il processo visualizzando tutto il listino (ordinato - da fare)
+            //termino il processo visualizzando tutto il listino ordinato
             for (int i = 0; i < num_prod_in_listino; i++)
             {
                 printf("\n%d - Prod. %d........... %f€ (min. %d pz.)", i, listino[i].codice_prodotto, listino[i].prezzo_unitario, listino[i].quantita_minima);
@@ -243,20 +262,13 @@ int main()
             for(int v = 0; v < num_market_aperti; v++) {
                
                printf("\n%d", supermercati[v].codice_supermercato);
-               printf("size_prodotti => %d", supermercati[pos_market].size_prodotti);
-
-               if(supermercati[pos_market].size_prodotti != 0) {
                 
                 for(int z = 0; z < supermercati[v].size_prodotti; z++){
                     printf("\n[%d]...........%d pz.", supermercati[v].prodotti[z].codice_prodotto, supermercati[v].prodotti[z].quantita_presente);
                 }
-               }
-               else {
-                printf("\nNessun prodotto in vendita");
-               }
             }
             goto start;
         default:
             break;
-        }
+    }
 }
