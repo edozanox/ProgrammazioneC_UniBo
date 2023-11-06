@@ -156,6 +156,7 @@ int main()
             {
                 printf("\n%d [Codice].........", i);
                 scanf("%d", &supermercati[i].codice_supermercato);
+                supermercati[i].size_prodotti = 0;
                 num_market_aperti++;
             }
             goto start;            
@@ -219,7 +220,43 @@ int main()
             goto start;
            
             break;
+        // Chiusura supermercato
         case 4:
+            int cod_mrkt_close = 0;
+            int cod_mrkt_trasf = 0;
+            bool operazione_ok = false;
+            
+            while(operazione_ok = false) {
+                printf("\n[Codice market da chiudere] [codice market trasferimento prodotti]");
+                scanf("\n%d %d", cod_mrkt_close, cod_mrkt_trasf);
+                
+                for(int i = 0; i < num_market_aperti; i++)
+                {
+                    if(supermercati[i].codice_supermercato == cod_mrkt_close)
+                    {
+                        for (int x = 0; x < num_market_aperti; x++)
+                        {
+                            if(supermercati[x].codice_supermercato == cod_mrkt_trasf) 
+                            {
+                                // Ciclo per spostamento Prodotti in altro market
+                                for (int y = 0; y < supermercati[i].size_prodotti; y++) {
+                                    if(supermercati[x].size_prodotti > 0) {
+
+                                        // controllo se il prodotto è già in vendita: se sì sposto la relativa quantità altrimenti istanzio il prodotto nell'array
+                                        for (int u = 0; u < supermercati[x].size_prodotti; u++)
+                                        {                                            
+                                            if(supermercati[x].prodotti[u].codice_prodotto)
+                                        }
+                                        
+                                    }
+                                }
+                            }
+                        }
+                        
+                    }
+                }
+            }
+
             break;
         // Vedi prodotti in esaurimento
         case 5:     
@@ -227,6 +264,7 @@ int main()
             while(market_exists == false){
                 printf("\nCodice supermercato:");
                 scanf("%d", &cod_mrkt_sel);
+
                 for(int x = 0; x < num_market_aperti; x++){
                     if(supermercati[x].codice_supermercato == cod_mrkt_sel) {
                         pos_market = x;
@@ -238,7 +276,6 @@ int main()
             }
                      
             for(int y = 0; y < supermercati[pos_market].size_prodotti; y++){ 
-                
             
                 //Cerco nel listino la quantità minima per il prodotto
                 for(int x = 0; x < num_prod_in_listino; x++) {
@@ -250,7 +287,6 @@ int main()
                         }
                     }
                 } 
-            
             }
             goto start;            
         case 6:
